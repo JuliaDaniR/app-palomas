@@ -5,22 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Palomas Deportivas</title>
 
-    <!-- PWA Meta Tags y Manifiesto (Para "Instalar como App") -->
-    <meta name="theme-color" content="#1e40af">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="apple-mobile-web-app-title" content="El Palomar">
-    <!-- ATENCIÓN: Este archivo manifest.json es necesario para que la instalación PWA funcione completamente y debe estar junto a index.html. -->
-    <link rel="manifest" href="/manifest.json">
-    <!-- Iconos de ejemplo (Debes reemplazarlos por tus propios iconos) -->
-    <link rel="apple-touch-icon" href="https://placehold.co/192x192/1e40af/FFFFFF?text=PWA">
-    <link rel="icon" href="https://placehold.co/32x32/1e40af/FFFFFF?text=PWA">
-
     <!-- Incluyendo Tailwind CSS -->
-    <!-- PRIMERO: Cargar la librería Tailwind desde el CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- SEGUNDO: Configuración para Dark Mode (class strategy), ahora que 'tailwind' está definido -->
+    <!-- Configuración para Dark Mode (class strategy) -->
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -32,7 +20,6 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
-            /* La clase bg-gray-100 dark:bg-gray-900 en el body manejará el fondo */
         }
         .card-shadow {
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -46,8 +33,42 @@
             opacity: 0.9;
         }
     </style>
+
+    <!-- ========================================================= -->
+    <!-- Sección PWA: Definición de Iconos y Manifest (Embedidos) -->
+    <!-- (Mantenidos del paso anterior) -->
+
+    <meta name="theme-color" content="#1e40af">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Colombicultura AR">
+    
+    <!-- Iconos de paloma sencillos (SVG incrustado como data-URI) -->
+    <link rel="icon" sizes="192x192" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%231e40af' d='M50 0C25 0 0 25 0 50s25 50 50 50 50-25 50-50S75 0 50 0z'/%3E%3Cpath fill='%23ffffff' d='M65 30c-2.8 0-5 2.2-5 5s2.2 5 5 5 5-2.2 5-5-2.2-5-5-5z'/%3E%3Cpath fill='%23ffffff' d='M35 30c-2.8 0-5 2.2-5 5s2.2 5 5 5 5-2.2 5-5-2.2-5-5-5z'/%3E%3Cpath fill='%23ffffff' d='M50 45c-5.5 0-10 4.5-10 10 0 5.5 10 20 10 20s10-14.5 10-20c0-5.5-4.5-10-10-10z'/%3E%3Cpath fill='%23ffffff' d='M45 50c0 5.5 5 15 5 15s5-9.5 5-15c0-2.7-2.3-5-5-5s-5 2.3-5 5z'/%3E%3Cpath fill='%23808080' d='M50 55s-5 9.5-5 15c0 5.5 4.5 10 10 10s10-4.5 10-10c0-5.5-5-15-5-15s-5-9.5-5-15c0 5.5 4.5 10-10 10s-10-4.5-10-10c0 5.5 5 15 5 15z'/%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%231e40af' d='M50 0C25 0 0 25 0 50s25 50 50 50 50-25 50-50S75 0 50 0z'/%3E%3Cpath fill='%23ffffff' d='M65 30c-2.8 0-5 2.2-5 5s2.2 5 5 5 5-2.2 5-5-2.2-5-5-5z'/%3E%3Cpath fill='%23ffffff' d='M35 30c-2.8 0-5 2.2-5 5s2.2 5 5 5 5-2.2 5-5-2.2-5-5-5z'/%3E%3Cpath fill='%23ffffff' d='M50 45c-5.5 0-10 4.5-10 10 0 5.5 10 20 10 20s10-14.5 10-20c0-5.5-4.5-10-10-10z'/%3E%3Cpath fill='%23ffffff' d='M45 50c0 5.5 5 15 5 15s5-9.5 5-15c0-2.7-2.3-5-5-5s-5 2.3-5 5z'/%3E%3Cpath fill='%23808080' d='M50 55s-5 9.5-5 15c0 5.5 4.5 10 10 10s10-4.5 10-10c0-5.5-5-15-5-15s-5-9.5-5-15c0 5.5 4.5 10-10 10s-10-4.5-10-10c0 5.5 5 15 5 15z'/%3E%3C/svg%3E">
+
+    <!-- Manifest.json incrustado (Script type=application/json) -->
+    <script type="application/json" id="manifest">
+        {
+          "name": "Colombicultura AR",
+          "short_name": "Palomas AR",
+          "description": "Gestión de Palomas Deportivas de la Asociación Colombicultura de Argentina.",
+          "start_url": "./",
+          "display": "standalone",
+          "background_color": "#ffffff",
+          "theme_color": "#1e40af",
+          "icons": [
+            {
+              "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%231e40af' d='M50 0C25 0 0 25 0 50s25 50 50 50 50-25 50-50S75 0 50 0z'/%3E%3Cpath fill='%23ffffff' d='M65 30c-2.8 0-5 2.2-5 5s2.2 5 5 5 5-2.2 5-5-2.2-5-5-5z'/%3E%3Cpath fill='%23ffffff' d='M35 30c-2.8 0-5 2.2-5 5s2.2 5 5 5 5-2.2 5-5-2.2-5-5-5z'/%3E%3Cpath fill='%23ffffff' d='M50 45c-5.5 0-10 4.5-10 10 0 5.5 10 20 10 20s10-14.5 10-20c0-5.5-4.5-10-10-10z'/%3E%3Cpath fill='%23ffffff' d='M45 50c0 5.5 5 15 5 15s5-9.5 5-15c0-2.7-2.3-5-5-5s-5 2.3-5 5z'/%3E%3Cpath fill='%23808080' d='M50 55s-5 9.5-5 15c0 5.5 4.5 10 10 10s10-4.5 10-10c0-5.5-5-15-5-15s-5-9.5-5-15c0 5.5 4.5 10-10 10s-10-4.5-10-10c0 5.5 5 15 5 15z'/%3E%3C/svg%3E",
+              "sizes": "192x192",
+              "type": "image/svg+xml"
+            }
+          ]
+        }
+    </script>
+    <!-- ========================================================= -->
+
 </head>
-<!-- Aplicamos los estilos de Dark Mode al body -->
 <body class="min-h-screen transition-colors duration-300 bg-gray-100 dark:bg-gray-900">
 
     <div id="app" class="p-4 sm:p-6 max-w-4xl mx-auto">
@@ -55,7 +76,7 @@
         <header class="py-6 bg-white dark:bg-gray-800 shadow-md rounded-xl mb-6 relative transition-colors duration-300">
             <!-- Botón de Alternancia de Tema -->
             <button onclick="toggleDarkMode()"
-                    class="absolute top-2 right-4 p-2 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-300 shadow-lg z-10">
+                    class="absolute top-4 right-4 p-2 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-300 shadow-lg z-10">
                 <span id="darkModeIcon">
                     <!-- Icono inicial se insertará por JS -->
                 </span>
@@ -63,23 +84,45 @@
             
             <!-- Contenedor del Título y Logo -->
             <div class="flex items-center justify-center space-x-4 px-4">
-                <!-- Logo -->
+                <!-- Logo: SVG de paloma simple incrustado como data-URI -->
                 <img src="./img/logo.png" 
-                     alt="Logo Asociación Argentina de Colombicultura"
-                     class="w-16 h-16 rounded-full shadow-lg object-contain sm:block">
+                     alt="Icono de Paloma"
+                     class="w-16 h-16 object-contain rounded-full shadow-lg sm:block border-4 border-blue-500/50 p-1 bg-white">
 
                 <h1 class="text-3xl font-bold text-center text-gray-800 dark:text-gray-100">
-                    Mis palomos 
+                    Asociación Colombicultura de Argentina 
                 </h1>
             </div>
         </header>
 
-        <!-- Botón para abrir el formulario de nueva paloma -->
-        <div class="mb-6 flex justify-between items-center">
-            <button onclick="openFormModal()"
-                class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-xl transition duration-150 ease-in-out shadow-lg transform hover:scale-105">
-                + Nueva Paloma
-            </button>
+        <!-- Contenedor de Filtro y Acciones -->
+        <div class="mb-6 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+            <!-- Filtro de Categoría -->
+            <div class="flex items-center space-x-3 w-full sm:w-auto">
+                <label for="categoryFilter" class="text-base font-semibold text-gray-700 dark:text-gray-200 flex-shrink-0">
+                    Filtrar por:
+                </label>
+                <select id="categoryFilter" onchange="renderPigeonList()"
+                        class="block w-full sm:w-56 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg p-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150">
+                    <option value="Todos">Todas las Categorías</option>
+                    <option value="Pichón">Pichón (Menos de 1 año)</option>
+                    <option value="Competición">Competición</option>
+                    <option value="Cría">Cría (Reproducción)</option>
+                    <option value="Reserva/Retiro">Reserva/Retiro</option>
+                </select>
+            </div>
+            
+            <!-- Botones de Acción -->
+            <div class="flex space-x-3 w-full sm:w-auto justify-end">
+                <button onclick="exportToPrintableTable()"
+                    class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-xl transition duration-150 ease-in-out shadow-lg transform hover:scale-105">
+                    Descargar Tabla (PDF)
+                </button>
+                <button onclick="openFormModal()"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-xl transition duration-150 ease-in-out shadow-lg transform hover:scale-105">
+                    + Nueva Paloma
+                </button>
+            </div>
         </div>
 
         <!-- Contenedor principal de la lista de palomas -->
@@ -114,10 +157,22 @@
                         </div>
                     </div>
 
-                    <!-- Nombre -->
-                    <div class="mb-4">
-                        <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Nombre</label>
-                        <input type="text" id="name" class="mt-1 block w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg p-3 focus:ring-blue-500 focus:border-blue-500">
+                    <!-- Nombre y Categoría (en una fila) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                         <div>
+                            <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Nombre</label>
+                            <input type="text" id="name" class="mt-1 block w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg p-3 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Categoría <span class="text-red-500">*</span></label>
+                            <select id="category" required class="mt-1 block w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg p-3 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="Pichón">Pichón (Menos de 1 año)</option>
+                                <option value="Competición">Competición</option>
+                                <option value="Cría">Cría (Reproducción)</option>
+                                <option value="Reserva/Retiro">Reserva/Retiro</option>
+                                <option value="Desconocido" selected>Desconocido</option>
+                            </select>
+                        </div>
                     </div>
 
                     <!-- Sexo y Fecha de Nacimiento (en una fila) -->
@@ -221,9 +276,8 @@
         const imageDataInput = document.getElementById('imageData');
         const imagePreview = document.getElementById('imagePreview');
         const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+        const categoryFilter = document.getElementById('categoryFilter');
 
-        // Se ha eliminado el código de registro del Service Worker para evitar el error de protocolo.
-        
         /**
          * Lee los datos del Local Storage y los carga en el array global.
          */
@@ -360,6 +414,9 @@
             imagePreviewContainer.classList.add('hidden');
             imageDataInput.value = ''; // Asegurar que el campo oculto de datos de imagen esté vacío
             imageUploadInput.value = ''; // Limpiar el input de tipo file
+            
+            // Valor por defecto de la Categoría
+            document.getElementById('category').value = 'Desconocido';
 
             if (pigeon) {
                 document.getElementById('formTitle').textContent = 'Editar Paloma: ' + pigeon.ringNumber;
@@ -379,6 +436,9 @@
                     imagePreview.src = '';
                     imagePreviewContainer.classList.add('hidden');
                 }
+                
+                // --- NUEVO CAMPO CATEGORÍA ---
+                document.getElementById('category').value = pigeon.category || 'Desconocido';
 
                 document.getElementById('name').value = pigeon.name || '';
                 document.getElementById('sex').value = pigeon.sex || 'Desconocido';
@@ -443,10 +503,12 @@
 
             const isEditing = !!document.getElementById('pigeonId').value;
 
+            // --- CAMBIO AQUÍ: Añadir el valor de la Categoría ---
             const newPigeonData = {
                 ringNumber: ringNumber,
                 imageData: imageDataInput.value || '', // Usamos imageData en lugar de imageURL
                 name: document.getElementById('name').value.trim() || 'Sin Nombre',
+                category: document.getElementById('category').value, // NUEVO
                 sex: document.getElementById('sex').value,
                 birthDate: document.getElementById('birthDate').value,
                 bandedBy: document.getElementById('bandedBy').value.trim() || '',
@@ -484,33 +546,59 @@
         };
 
         /**
-         * Crea la tarjeta HTML para mostrar una paloma en la lista (Diseño simplificado).
+         * Asigna una clase de color a la tarjeta según la categoría.
+         * @param {string} category - La categoría de la paloma.
+         * @returns {string} Clase CSS de Tailwind para el borde o el anillo de color.
+         */
+        function getCategoryColor(category) {
+            switch(category) {
+                case 'Pichón':
+                    return 'ring-green-400'; // Verde para jóvenes
+                case 'Competición':
+                    return 'ring-red-500'; // Rojo para competición
+                case 'Cría':
+                    return 'ring-blue-500'; // Azul para cría
+                case 'Reserva/Retiro':
+                    return 'ring-yellow-500'; // Amarillo para reserva
+                default:
+                    return 'ring-gray-300';
+            }
+        }
+        
+        /**
+         * Crea la tarjeta HTML para mostrar una paloma en la lista.
          * @param {Object} pigeon - Objeto con los datos de la paloma.
          */
         function createPigeonCard(pigeon) {
+            const colorClass = getCategoryColor(pigeon.category);
+            
             const card = document.createElement('div');
-            // Diseño simplificado: Imagen, Nombre/Anillo y botón "Ver Datos"
-            card.className = 'bg-white dark:bg-gray-800 rounded-xl p-4 card-shadow flex items-center justify-between hover:ring-2 ring-blue-500 transition duration-150 transition-colors duration-300';
+            // Añadir el color de la categoría al anillo (ring) de la tarjeta
+            card.className = `bg-white dark:bg-gray-800 rounded-xl p-4 card-shadow flex items-center justify-between hover:ring-2 ${colorClass} transition duration-150 transition-colors duration-300`;
             card.setAttribute('data-ring', pigeon.ringNumber);
 
             const imageSrc = pigeon.imageData || PLACEHOLDER_IMAGE;
+            const categoryDisplay = pigeon.category || 'Desconocido';
 
             card.innerHTML = `
-                <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-4 min-w-0 flex-1">
                     <img src="${imageSrc}" onerror="this.onerror=null; this.src='${PLACEHOLDER_IMAGE}';"
                          alt="Foto de ${pigeon.name}"
                          class="w-16 h-16 object-cover rounded-full flex-shrink-0">
                     
-                    <!-- Nombre y N° Anillo (Nombre en negrita, Anillo en gris más pequeño) -->
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 leading-tight">
-                        ${pigeon.name || 'Sin Nombre'}
-                        <span class="text-sm text-gray-500 dark:text-gray-400 font-normal block md:inline">(${pigeon.ringNumber})</span>
-                    </h3>
+                    <!-- Nombre y N° Anillo + Categoría -->
+                    <div class="min-w-0">
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 leading-tight truncate">
+                            ${pigeon.name || 'Sin Nombre'}
+                            <span class="text-sm text-gray-500 dark:text-gray-400 font-normal block md:inline">(${pigeon.ringNumber})</span>
+                        </h3>
+                        <span class="inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${colorClass.replace('ring', 'bg').replace('500', '100').replace('400', '100')} ${colorClass.replace('ring', 'text')} dark:bg-opacity-20 mt-1">${categoryDisplay}</span>
+                    </div>
                 </div>
                 
                 <!-- Botón para ver todos los datos -->
                 <button onclick="viewPigeonDetail('${pigeon.ringNumber}', event)"
-                        class="text-sm px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition transform hover:scale-105">
+                        class="text-sm px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition transform hover:scale-105 flex-shrink-0 ml-4">
                     Ver Datos
                 </button>
             `;
@@ -518,27 +606,38 @@
         }
 
         /**
-         * Renderiza la lista completa de palomas.
+         * Renderiza la lista completa de palomas, aplicando el filtro de categoría.
          */
         function renderPigeonList() {
             const listContainer = document.getElementById('pigeonList');
-            const loadingMessage = document.getElementById('loadingMessage');
-            if (loadingMessage) loadingMessage.remove(); 
+            const currentFilter = categoryFilter.value;
+
+            // Filtrar y ordenar
+            let filteredPigeons = pigeonsArray.filter(pigeon => {
+                if (currentFilter === 'Todos') {
+                    return true;
+                }
+                // Asegurar que category exista para evitar errores
+                const category = pigeon.category || 'Desconocido'; 
+                return category === currentFilter;
+            });
 
             // Ordenar por N° Anillo para consistencia
-            pigeonsArray.sort((a, b) => (a.ringNumber > b.ringNumber) ? 1 : -1);
+            filteredPigeons.sort((a, b) => (a.ringNumber > b.ringNumber) ? 1 : -1);
 
             listContainer.innerHTML = ''; // Limpiar lista
 
-            if (pigeonsArray.length === 0) {
-                listContainer.innerHTML = '<p class="text-center text-gray-500 dark:text-gray-400 p-8 bg-white dark:bg-gray-800 rounded-xl card-shadow transition-colors duration-300">No hay palomas registradas. ¡Agrega la primera!</p>';
+            if (filteredPigeons.length === 0) {
+                listContainer.innerHTML = `<p class="text-center text-gray-500 dark:text-gray-400 p-8 bg-white dark:bg-gray-800 rounded-xl card-shadow transition-colors duration-300">
+                    No hay palomas registradas en la categoría de <strong>${currentFilter}</strong>.
+                </p>`;
             } else {
-                pigeonsArray.forEach(pigeon => {
+                filteredPigeons.forEach(pigeon => {
                     listContainer.appendChild(createPigeonCard(pigeon));
                 });
             }
 
-            console.log(`Datos de palomas cargados: ${pigeonsArray.length} registros.`);
+            console.log(`Datos de palomas cargados: ${pigeonsArray.length} registros. Mostrando ${filteredPigeons.length} filtrados por ${currentFilter}.`);
         }
 
         /**
@@ -574,6 +673,19 @@
             }
         }
 
+        /**
+         * Función auxiliar para abrir el modal de edición y cerrar el de detalles.
+         * Soluciona el problema de que el formulario no aparecía correctamente.
+         * @param {string} pigeonJsonString - Datos de la paloma en formato JSON string.
+         */
+        window.editPigeonFromDetail = (pigeonJsonString) => {
+            // 1. Cerrar el modal de detalles primero
+            closeDetailModal(); 
+            // 2. Parsear el JSON y abrir el formulario
+            const pigeon = JSON.parse(pigeonJsonString);
+            openFormModal(pigeon);
+        };
+
 
         /**
          * Muestra los detalles de una paloma en un modal.
@@ -600,9 +712,10 @@
                 const imageSrc = pigeon.imageData || PLACEHOLDER_IMAGE; // Usar imageData para la imagen
 
                 // Usamos JSON.stringify para pasar el objeto completo al modal de edición
+                // Importante: Reemplazar las comillas dobles por &quot; para la llamada inline
                 const pigeonJsonString = JSON.stringify(pigeon).replace(/"/g, '&quot;');
                 
-                // --- Nueva Lógica para Botones Ver Padre/Madre ---
+                const categoryColorClass = getCategoryColor(pigeon.category).replace('ring', 'bg');
                 
                 // Botón/link para el Padre
                 let fatherRingDisplay = '<span class="text-gray-500 dark:text-gray-400">N/A</span>';
@@ -641,6 +754,7 @@
                     <div class="border-t dark:border-gray-700 pt-4 space-y-2">
                         <p><strong>N° Anillo:</strong> ${pigeon.ringNumber}</p>
                         <p><strong>Sexo:</strong> ${pigeon.sex}</p>
+                        <p><strong>Categoría:</strong> <span class="font-semibold px-2 py-0.5 rounded-lg ${categoryColorClass} bg-opacity-10">${pigeon.category}</span></p>
                         <p><strong>Fecha Nac.:</strong> ${pigeon.birthDate || 'N/A'}</p>
                         <p><strong>Plumaje:</strong> ${pigeon.plumage || 'N/A'}</p>
                         <p><strong>Anillado Por:</strong> ${pigeon.bandedBy || 'N/A'}</p>
@@ -660,9 +774,9 @@
                         <p class="text-sm italic text-gray-600 dark:text-gray-400 ml-4">${pigeon.motherDescription || 'Sin descripción.'}</p>
                     </fieldset>
                     
-                    <!-- Botones de Acción Movidós al Modal de Detalles -->
+                    <!-- Botones de Acción: Se usa editPigeonFromDetail para solucionar el bug -->
                     <div class="flex justify-center space-x-4 mt-6 border-t dark:border-gray-700 pt-4">
-                        <button onclick="openFormModal(${pigeonJsonString})"
+                        <button onclick="editPigeonFromDetail('${pigeonJsonString}')"
                                 class="text-sm px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white font-medium rounded-xl transition transform hover:scale-105 shadow-md">
                             Editar Paloma
                         </button>
@@ -683,6 +797,88 @@
             const modal = document.getElementById('detailModal');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
+        };
+
+        /**
+         * Genera una tabla HTML con todos los datos y la abre en una ventana para imprimir/PDF.
+         */
+        window.exportToPrintableTable = () => {
+            if (pigeonsArray.length === 0) {
+                showNotification("No hay datos para exportar.", 'error');
+                return;
+            }
+
+            // Encabezados de la tabla (las claves que queremos mostrar)
+            // *** SE HAN AÑADIDO fatherDescription y motherDescription ***
+            const headers = [
+                { key: 'ringNumber', label: 'N° Anillo' },
+                { key: 'name', label: 'Nombre' },
+                { key: 'category', label: 'Categoría' }, 
+                { key: 'sex', label: 'Sexo' },
+                { key: 'birthDate', label: 'Fecha Nac.' },
+                { key: 'plumage', label: 'Plumaje' },
+                { key: 'bandedBy', label: 'Anillado Por' },
+                { key: 'fatherRingNumber', label: 'Padre (N°)' },
+                { key: 'fatherDescription', label: 'Desc. Padre' }, // NUEVA COLUMNA
+                { key: 'motherRingNumber', label: 'Madre (N°)' },
+                { key: 'motherDescription', label: 'Desc. Madre' } // NUEVA COLUMNA
+            ];
+
+            // Generar la tabla HTML completa
+            let tableHtml = `
+                <style>
+                    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+                    body { font-family: 'Inter', sans-serif; padding: 20px; color: #333; }
+                    h1 { font-size: 24px; margin-bottom: 20px; text-align: center; }
+                    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                    th, td { border: 1px solid #ccc; padding: 8px 12px; text-align: left; font-size: 10px; }
+                    th { background-color: #f3f4f6; font-weight: 600; color: #1f2937; }
+                    /* Estilo para impresión, ocultar la imagen */
+                    @media print {
+                        body { padding: 0; }
+                        .no-print { display: none; }
+                        th, td { border: 1px solid #000; padding: 6px; }
+                    }
+                </style>
+                <h1>Registro de Palomas Deportivas - Asociación Colombicultura de Argentina</h1>
+                <table>
+                    <thead>
+                        <tr>
+                            ${headers.map(h => `<th>${h.label}</th>`).join('')}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${pigeonsArray.map(pigeon => `
+                            <tr>
+                                ${headers.map(h => `<td>${pigeon[h.key] || 'N/A'}</td>`).join('')}
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                <div class="no-print" style="text-align: center; margin-top: 20px; color: #555; border: 1px solid #ddd; padding: 10px; border-radius: 8px;">
+                    <p style="font-weight: bold; color: #007bff; margin-bottom: 5px;">INSTRUCCIONES PARA DESCARGAR EL PDF:</p>
+                    <ol style="text-align: left; display: inline-block;">
+                        <li>En la ventana de impresión que acaba de abrirse, busque la opción **"Destino"** (o "Impresora").</li>
+                        <li>Cambie el destino a **"Guardar como PDF"** (o "Save as PDF").</li>
+                        <li>Haga clic en el botón **"Guardar"** o **"Imprimir"** para seleccionar la ubicación del archivo en su dispositivo.</li>
+                    </ol>
+                </div>
+            `;
+
+            // Abrir una nueva ventana con el contenido de la tabla
+            const printWindow = window.open('', '_blank', 'width=800,height=600');
+            if (printWindow) {
+                printWindow.document.write(tableHtml);
+                printWindow.document.close();
+                
+                // Esperar un momento para que el navegador cargue los estilos antes de imprimir
+                printWindow.onload = () => {
+                    printWindow.focus();
+                    printWindow.print();
+                };
+            } else {
+                showNotification("Error al abrir la ventana de impresión. Verifique la configuración de ventanas emergentes.", 'error');
+            }
         };
 
         // Iniciar la aplicación: Cargar datos del Local Storage al iniciar
