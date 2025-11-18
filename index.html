@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Palomas Deportivas</title>
+
+    <!-- PWA Meta Tags y Manifiesto (Para "Instalar como App") -->
+    <meta name="theme-color" content="#1e40af">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="El Palomar">
+    <!-- ATENCIÓN: Este archivo manifest.json es necesario para que la instalación PWA funcione completamente y debe estar junto a index.html. -->
+    <link rel="manifest" href="/manifest.json">
+    <!-- Iconos de ejemplo (Debes reemplazarlos por tus propios iconos) -->
+    <link rel="apple-touch-icon" href="https://placehold.co/192x192/1e40af/FFFFFF?text=PWA">
+    <link rel="icon" href="https://placehold.co/32x32/1e40af/FFFFFF?text=PWA">
+
+    <!-- Incluyendo Tailwind CSS -->
+    <!-- PRIMERO: Cargar la librería Tailwind desde el CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- SEGUNDO: Configuración para Dark Mode (class strategy), ahora que 'tailwind' está definido -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    
+    <!-- Configuración de la fuente y estilos base -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            /* La clase bg-gray-100 dark:bg-gray-900 en el body manejará el fondo */
+        }
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .ring-link {
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+        .ring-link:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<!-- Aplicamos los estilos de Dark Mode al body -->
+<body class="min-h-screen transition-colors duration-300 bg-gray-100 dark:bg-gray-900">
+
+    <div id="app" class="p-4 sm:p-6 max-w-4xl mx-auto">
+        <!-- Header con el Botón de Dark Mode y Logo -->
+        <header class="py-6 bg-white dark:bg-gray-800 shadow-md rounded-xl mb-6 relative transition-colors duration-300">
+            <!-- Botón de Alternancia de Tema -->
+            <button onclick="toggleDarkMode()"
+                    class="absolute top-2 right-4 p-2 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-300 shadow-lg z-10">
+                <span id="darkModeIcon">
+                    <!-- Icono inicial se insertará por JS -->
+                </span>
+            </button>
+            
+            <!-- Contenedor del Título y Logo -->
+            <div class="flex items-center justify-center space-x-4 px-4">
+                <!-- Logo -->
+                <img src="./img/logo.png" 
+                     alt="Logo Asociación Argentina de Colombicultura"
+                     class="w-16 h-16 rounded-full shadow-lg object-contain sm:block">
+
+                <h1 class="text-3xl font-bold text-center text-gray-800 dark:text-gray-100">
+                    Mis palomos 
+                </h1>
+            </div>
+        </header>
+
+        <!-- Botón para abrir el formulario de nueva paloma -->
+        <div class="mb-6 flex justify-between items-center">
+            <button onclick="openFormModal()"
+                class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-xl transition duration-150 ease-in-out shadow-lg transform hover:scale-105">
+                + Nueva Paloma
+            </button>
+        </div>
+
+        <!-- Contenedor principal de la lista de palomas -->
+        <div id="pigeonList" class="space-y-4">
+            <!-- Las tarjetas de palomas se insertarán aquí por JavaScript -->
+            <p id="loadingMessage" class="text-center text-gray-500 dark:text-gray-400 italic">Cargando datos...</p>
+        </div>
+
+        <!-- Contenedor para mensajes de error/confirmación -->
+        <div id="messageContainer" class="fixed bottom-4 right-4 z-50"></div>
+
+        <!-- Modal para el Formulario (Añadir/Editar Paloma) -->
+        <div id="formModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden items-center justify-center p-4 z-50">
+            <div class="bg-white dark:bg-gray-800 rounded-xl w-full max-w-lg p-6 card-shadow overflow-y-auto max-h-[90vh] transition-colors duration-300">
+                <h3 id="formTitle" class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4 border-b dark:border-gray-700 pb-2">Registrar Nueva Paloma</h3>
+                <form id="pigeonForm" onsubmit="handleFormSubmit(event)">
+                    <input type="hidden" id="pigeonId" value="">
+
+                    <!-- N° Anillo (Obligatorio y Único) -->
+                    <div class="mb-4">
+                        <label for="ringNumber" class="block text-sm font-medium text-gray-700 dark:text-gray-200">N° Anillo <span class="text-red-500">*</span></label>
+                        <input type="text" id="ringNumber" required class="mt-1 block w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg p-3 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+
+                    <!-- Input de Imagen (para subir archivo o tomar con cámara) -->
+                    <div class="mb-4">
+                        <label for="imageUpload" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Foto de la Paloma</label>
+                        <input type="file" id="imageUpload" accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer dark:file:bg-blue-900 dark:file:text-blue-100 dark:hover:file:bg-blue-800">
+                        <input type="hidden" id="imageData" value=""> <!-- Aquí guardaremos el Base64 -->
+                        <div id="imagePreviewContainer" class="mt-2 flex justify-center border border-gray-200 dark:border-gray-700 rounded-lg p-2 bg-gray-50 dark:bg-gray-900 hidden">
+                            <img id="imagePreview" src="" alt="Previsualización" class="max-h-32 object-contain rounded-md">
+                        </div>
+                    </div>
+
+                    <!-- Nombre -->
+                    <div class="mb-4">
+                        <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Nombre</label>
+                        <input type="text" id="name" class="mt-1 block w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg p-3 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+
+                    <!-- Sexo y Fecha de Nacimiento (en una fila) -->
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label for="sex" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Sexo</label>
+                            <select id="sex" class="mt-1 block w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg p-3 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="Macho">Macho</option>
+                                <option value="Hembra">Hembra</option>
+                                <option value="Desconocido">Desconocido</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="birthDate" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Fecha Nac.</label>
+                            <input type="date" id="birthDate" class="mt-1 block w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg p-3 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                    </div>
+
+                    <!-- Anillado Por y Plumaje (en una fila) -->
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label for="bandedBy" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Anillado Por</label>
+                            <input type="text" id="bandedBy" class="mt-1 block w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg p-3 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="plumage" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Plumaje</label>
+                            <input type="text" id="plumage" class="mt-1 block w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg p-3 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                    </div>
+
+                    <!-- Sección Padre -->
+                    <fieldset class="border border-gray-300 dark:border-gray-700 p-4 rounded-lg mb-4">
+                        <legend class="text-md font-semibold text-gray-700 dark:text-gray-200 px-2">Padre</legend>
+                        <div class="mb-4">
+                            <label for="fatherRingNumber" class="block text-sm font-medium text-gray-700 dark:text-gray-200">N° Anillo Padre</label>
+                            <input type="text" id="fatherRingNumber" class="mt-1 block w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg p-3 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div class="mb-4">
+                            <label for="fatherDescription" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Descripción Padre</label>
+                            <textarea id="fatherDescription" rows="2" class="mt-1 block w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg p-3 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                        </div>
+                    </fieldset>
+
+                    <!-- Sección Madre -->
+                    <fieldset class="border border-gray-300 dark:border-gray-700 p-4 rounded-lg mb-6">
+                        <legend class="text-md font-semibold text-gray-700 dark:text-gray-200 px-2">Madre</legend>
+                        <div class="mb-4">
+                            <label for="motherRingNumber" class="block text-sm font-medium text-gray-700 dark:text-gray-200">N° Anillo Madre</label>
+                            <input type="text" id="motherRingNumber" class="mt-1 block w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg p-3 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div class="mb-4">
+                            <label for="motherDescription" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Descripción Madre</label>
+                            <textarea id="motherDescription" rows="2" class="mt-1 block w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg p-3 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                        </div>
+                    </fieldset>
+
+                    <div class="flex justify-end space-x-3">
+                        <button type="button" onclick="closeFormModal()" class="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100 font-semibold py-2 px-4 rounded-xl transition duration-150">
+                            Cancelar
+                        </button>
+                        <button type="submit" id="saveButton" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-xl transition duration-150 transform hover:scale-105">
+                            Guardar Paloma
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal para Ver Detalles/Padres -->
+        <div id="detailModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden items-center justify-center p-4 z-50">
+            <div class="bg-white dark:bg-gray-800 rounded-xl w-full max-w-lg p-6 card-shadow overflow-y-auto max-h-[90vh] transition-colors duration-300">
+                <div class="flex justify-between items-start border-b dark:border-gray-700 pb-2 mb-4">
+                    <h3 id="detailTitle" class="text-2xl font-bold text-gray-800 dark:text-gray-100">Detalles de Paloma</h3>
+                    <button onclick="closeDetailModal()" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-3xl font-light leading-none">&times;</button>
+                </div>
+                <div id="detailContent" class="space-y-4 text-gray-900 dark:text-gray-200">
+                    <!-- Los detalles se cargarán aquí -->
+                </div>
+                <div class="mt-6 flex justify-end">
+                    <button onclick="closeDetailModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-xl transition duration-150">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Script de Local Storage y la Lógica de la Aplicación -->
+    <script type="text/javascript">
+
+        // --- Variables y Configuración de Local Storage ---
+        let pigeonsArray = [];
+        const PIGEON_STORAGE_KEY = 'pigeonsData';
+        const DARK_MODE_KEY = 'darkModeEnabled';
+        // Placeholder de imagen por defecto
+        const PLACEHOLDER_IMAGE = "https://placehold.co/100x100/94A3B8/FFFFFF?text=Paloma";
+
+        // Referencias a elementos de imagen para previsualización
+        const imageUploadInput = document.getElementById('imageUpload');
+        const imageDataInput = document.getElementById('imageData');
+        const imagePreview = document.getElementById('imagePreview');
+        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+
+        // Se ha eliminado el código de registro del Service Worker para evitar el error de protocolo.
+        
+        /**
+         * Lee los datos del Local Storage y los carga en el array global.
+         */
+        function loadPigeons() {
+            const json = localStorage.getItem(PIGEON_STORAGE_KEY);
+            try {
+                pigeonsArray = json ? JSON.parse(json) : [];
+            } catch (e) {
+                console.error("Error al parsear datos de Local Storage:", e);
+                pigeonsArray = [];
+            }
+            renderPigeonList();
+        }
+
+        /**
+         * Guarda el array global de palomas en el Local Storage.
+         */
+        function savePigeons() {
+            try {
+                localStorage.setItem(PIGEON_STORAGE_KEY, JSON.stringify(pigeonsArray));
+                renderPigeonList();
+            } catch (e) {
+                console.error("Error al guardar datos en Local Storage:", e);
+                showNotification("Error: No se pudo guardar la información.", 'error');
+            }
+        }
+
+        // --- Funciones para Dark Mode ---
+        
+        /**
+         * Actualiza el icono del botón de Dark Mode (Sol/Luna) y aplica/remueve la clase 'dark'.
+         * @param {boolean} isDark - True para modo oscuro, false para claro.
+         */
+        function applyDarkMode(isDark) {
+            const htmlEl = document.documentElement;
+            const iconContainer = document.getElementById('darkModeIcon');
+            
+            // Iconos SVG
+            const sunIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>`;
+            const moonIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+            </svg>`;
+
+            if (isDark) {
+                htmlEl.classList.add('dark');
+                if (iconContainer) iconContainer.innerHTML = sunIcon; // Mostrar sol para cambiar a claro
+                localStorage.setItem(DARK_MODE_KEY, 'true');
+            } else {
+                htmlEl.classList.remove('dark');
+                if (iconContainer) iconContainer.innerHTML = moonIcon; // Mostrar luna para cambiar a oscuro
+                localStorage.setItem(DARK_MODE_KEY, 'false');
+            }
+        }
+
+        /**
+         * Alterna entre modo oscuro y claro. Expuesta globalmente.
+         */
+        window.toggleDarkMode = () => {
+            const isCurrentlyDark = document.documentElement.classList.contains('dark');
+            applyDarkMode(!isCurrentlyDark);
+        };
+
+        /**
+         * Inicializa el modo oscuro basado en localStorage o la preferencia del sistema.
+         */
+        function initDarkMode() {
+            const savedMode = localStorage.getItem(DARK_MODE_KEY);
+            let isDark = false;
+
+            if (savedMode !== null) {
+                // Usar la preferencia guardada (si es 'true' o 'false')
+                isDark = savedMode === 'true';
+            } else {
+                // Usar la preferencia del sistema operativo si no hay preferencia guardada
+                isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            }
+            
+            // Aplicar la clase y actualizar el icono
+            applyDarkMode(isDark);
+        }
+
+        // --- Fin de funciones para Dark Mode ---
+
+        /**
+         * Muestra una notificación temporal al usuario.
+         * @param {string} message - El mensaje a mostrar.
+         * @param {string} type - Tipo de mensaje ('success' o 'error').
+         */
+        function showNotification(message, type = 'success') {
+            const container = document.getElementById('messageContainer');
+            const colorClass = type === 'success' ? 'bg-green-500' : 'bg-red-500';
+
+            const notification = document.createElement('div');
+            notification.className = `${colorClass} text-white px-6 py-3 rounded-xl shadow-xl mb-3 transition-opacity duration-300 opacity-0 transform translate-y-2`;
+            notification.textContent = message;
+
+            container.prepend(notification); // Añadir al principio
+
+            // Animar entrada
+            setTimeout(() => {
+                notification.classList.remove('opacity-0', 'translate-y-2');
+                notification.classList.add('opacity-100', 'translate-y-0');
+            }, 10);
+
+            // Animar salida y remover
+            setTimeout(() => {
+                notification.classList.remove('opacity-100', 'translate-y-0');
+                notification.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => notification.remove(), 500);
+            }, 5000);
+        }
+
+        /**
+         * Abre el modal del formulario (para agregar o editar).
+         * @param {Object} [pigeon] - Datos de la paloma a editar.
+         */
+        window.openFormModal = (pigeon = null) => {
+            const modal = document.getElementById('formModal');
+            const form = document.getElementById('pigeonForm');
+            const ringNumberInput = document.getElementById('ringNumber');
+            const saveButton = document.getElementById('saveButton');
+
+            // Limpiar formulario por defecto
+            form.reset();
+            document.getElementById('pigeonId').value = '';
+            ringNumberInput.disabled = false;
+            document.getElementById('formTitle').textContent = 'Registrar Nueva Paloma';
+            saveButton.textContent = 'Guardar Paloma';
+
+            // Limpiar previsualización de imagen
+            imagePreview.src = '';
+            imagePreviewContainer.classList.add('hidden');
+            imageDataInput.value = ''; // Asegurar que el campo oculto de datos de imagen esté vacío
+            imageUploadInput.value = ''; // Limpiar el input de tipo file
+
+            if (pigeon) {
+                document.getElementById('formTitle').textContent = 'Editar Paloma: ' + pigeon.ringNumber;
+                saveButton.textContent = 'Actualizar Paloma';
+                document.getElementById('pigeonId').value = pigeon.ringNumber;
+
+                // Cargar datos
+                ringNumberInput.value = pigeon.ringNumber || '';
+                ringNumberInput.disabled = true; // No permitir cambiar el N° de Anillo al editar
+
+                // Cargar imagen si existe
+                if (pigeon.imageData) {
+                    imageDataInput.value = pigeon.imageData;
+                    imagePreview.src = pigeon.imageData;
+                    imagePreviewContainer.classList.remove('hidden');
+                } else {
+                    imagePreview.src = '';
+                    imagePreviewContainer.classList.add('hidden');
+                }
+
+                document.getElementById('name').value = pigeon.name || '';
+                document.getElementById('sex').value = pigeon.sex || 'Desconocido';
+                document.getElementById('birthDate').value = pigeon.birthDate || '';
+                document.getElementById('bandedBy').value = pigeon.bandedBy || '';
+                document.getElementById('plumage').value = pigeon.plumage || '';
+                document.getElementById('fatherRingNumber').value = pigeon.fatherRingNumber || '';
+                document.getElementById('fatherDescription').value = pigeon.fatherDescription || '';
+                document.getElementById('motherRingNumber').value = pigeon.motherRingNumber || '';
+                document.getElementById('motherDescription').value = pigeon.motherDescription || '';
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        };
+
+        /** Cierra el modal del formulario. */
+        window.closeFormModal = () => {
+            const modal = document.getElementById('formModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        };
+
+        /**
+         * Maneja el cambio en el input de archivo para previsualizar la imagen y convertirla a Base64.
+         */
+        imageUploadInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    imageDataInput.value = e.target.result; // Guardar el Base64 en el input oculto
+                    imagePreviewContainer.classList.remove('hidden');
+                };
+                reader.onerror = function() {
+                    showNotification("Error al cargar la imagen.", 'error');
+                    imagePreview.src = '';
+                    imageDataInput.value = '';
+                    imagePreviewContainer.classList.add('hidden');
+                };
+                reader.readAsDataURL(file); // Convertir a Base64
+            } else {
+                imagePreview.src = '';
+                imageDataInput.value = '';
+                imagePreviewContainer.classList.add('hidden');
+            }
+        });
+
+        /**
+         * Maneja el envío del formulario para guardar o actualizar una paloma.
+         * @param {Event} event - El evento de envío del formulario.
+         */
+        window.handleFormSubmit = (event) => {
+            event.preventDefault();
+
+            const ringNumber = document.getElementById('ringNumber').value.trim();
+            if (!ringNumber) {
+                showNotification("El N° de Anillo es obligatorio.", 'error');
+                return;
+            }
+
+            const isEditing = !!document.getElementById('pigeonId').value;
+
+            const newPigeonData = {
+                ringNumber: ringNumber,
+                imageData: imageDataInput.value || '', // Usamos imageData en lugar de imageURL
+                name: document.getElementById('name').value.trim() || 'Sin Nombre',
+                sex: document.getElementById('sex').value,
+                birthDate: document.getElementById('birthDate').value,
+                bandedBy: document.getElementById('bandedBy').value.trim() || '',
+                plumage: document.getElementById('plumage').value.trim() || '',
+                fatherRingNumber: document.getElementById('fatherRingNumber').value.trim() || '',
+                fatherDescription: document.getElementById('fatherDescription').value.trim() || '',
+                motherRingNumber: document.getElementById('motherRingNumber').value.trim() || '',
+                motherDescription: document.getElementById('motherDescription').value.trim() || '',
+                updatedAt: new Date().toISOString()
+            };
+
+            const existingIndex = pigeonsArray.findIndex(p => p.ringNumber === ringNumber);
+
+            if (isEditing) {
+                // Actualizar paloma existente
+                if (existingIndex !== -1) {
+                    pigeonsArray[existingIndex] = { ...pigeonsArray[existingIndex], ...newPigeonData };
+                    showNotification(`Paloma ${ringNumber} actualizada exitosamente.`, 'success');
+                } else {
+                    showNotification(`Error: No se encontró la paloma ${ringNumber} para actualizar.`, 'error');
+                    return;
+                }
+            } else {
+                // Añadir nueva paloma
+                if (existingIndex !== -1) {
+                    showNotification(`El N° de Anillo ${ringNumber} ya está registrado.`, 'error');
+                    return;
+                }
+                pigeonsArray.push(newPigeonData);
+                showNotification(`Paloma ${ringNumber} guardada exitosamente.`, 'success');
+            }
+
+            savePigeons();
+            closeFormModal();
+        };
+
+        /**
+         * Crea la tarjeta HTML para mostrar una paloma en la lista (Diseño simplificado).
+         * @param {Object} pigeon - Objeto con los datos de la paloma.
+         */
+        function createPigeonCard(pigeon) {
+            const card = document.createElement('div');
+            // Diseño simplificado: Imagen, Nombre/Anillo y botón "Ver Datos"
+            card.className = 'bg-white dark:bg-gray-800 rounded-xl p-4 card-shadow flex items-center justify-between hover:ring-2 ring-blue-500 transition duration-150 transition-colors duration-300';
+            card.setAttribute('data-ring', pigeon.ringNumber);
+
+            const imageSrc = pigeon.imageData || PLACEHOLDER_IMAGE;
+
+            card.innerHTML = `
+                <div class="flex items-center space-x-4">
+                    <img src="${imageSrc}" onerror="this.onerror=null; this.src='${PLACEHOLDER_IMAGE}';"
+                         alt="Foto de ${pigeon.name}"
+                         class="w-16 h-16 object-cover rounded-full flex-shrink-0">
+                    
+                    <!-- Nombre y N° Anillo (Nombre en negrita, Anillo en gris más pequeño) -->
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 leading-tight">
+                        ${pigeon.name || 'Sin Nombre'}
+                        <span class="text-sm text-gray-500 dark:text-gray-400 font-normal block md:inline">(${pigeon.ringNumber})</span>
+                    </h3>
+                </div>
+                
+                <!-- Botón para ver todos los datos -->
+                <button onclick="viewPigeonDetail('${pigeon.ringNumber}', event)"
+                        class="text-sm px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition transform hover:scale-105">
+                    Ver Datos
+                </button>
+            `;
+            return card;
+        }
+
+        /**
+         * Renderiza la lista completa de palomas.
+         */
+        function renderPigeonList() {
+            const listContainer = document.getElementById('pigeonList');
+            const loadingMessage = document.getElementById('loadingMessage');
+            if (loadingMessage) loadingMessage.remove(); 
+
+            // Ordenar por N° Anillo para consistencia
+            pigeonsArray.sort((a, b) => (a.ringNumber > b.ringNumber) ? 1 : -1);
+
+            listContainer.innerHTML = ''; // Limpiar lista
+
+            if (pigeonsArray.length === 0) {
+                listContainer.innerHTML = '<p class="text-center text-gray-500 dark:text-gray-400 p-8 bg-white dark:bg-gray-800 rounded-xl card-shadow transition-colors duration-300">No hay palomas registradas. ¡Agrega la primera!</p>';
+            } else {
+                pigeonsArray.forEach(pigeon => {
+                    listContainer.appendChild(createPigeonCard(pigeon));
+                });
+            }
+
+            console.log(`Datos de palomas cargados: ${pigeonsArray.length} registros.`);
+        }
+
+        /**
+         * Elimina una paloma.
+         * @param {string} ringNumber - N° de Anillo de la paloma.
+         */
+        window.deletePigeon = (ringNumber) => {
+            const initialLength = pigeonsArray.length;
+            // Filtra el array, manteniendo todas las palomas excepto la que tiene el ringNumber a eliminar
+            pigeonsArray = pigeonsArray.filter(p => p.ringNumber !== ringNumber);
+            
+            if (pigeonsArray.length < initialLength) {
+                savePigeons();
+                showNotification(`Paloma ${ringNumber} eliminada.`, 'success');
+                return true;
+            } else {
+                showNotification(`Error: No se encontró la paloma ${ringNumber}.`, 'error');
+                return false;
+            }
+        };
+        
+        /** * Elimina una paloma y cierra el modal de detalles. 
+         * ATENCIÓN: En una aplicación real, este paso debe ser envuelto en un modal de confirmación.
+         */
+        window.deleteAndClose = (ringNumber) => {
+            // Se usa confirm() aquí, pero se recomienda un modal personalizado en producción.
+            const isConfirmed = confirm(`¿Estás seguro de que quieres eliminar a la paloma con N° Anillo ${ringNumber}?`);
+            if (!isConfirmed) return;
+
+            const isDeleted = window.deletePigeon(ringNumber);
+            if(isDeleted) {
+                closeDetailModal();
+            }
+        }
+
+
+        /**
+         * Muestra los detalles de una paloma en un modal.
+         * @param {string} ringNumber - N° de Anillo de la paloma a buscar.
+         * @param {Event} event - El evento (para detener la propagación si viene de un link).
+         */
+        window.viewPigeonDetail = (ringNumber, event) => {
+            if (event) event.stopPropagation();
+
+            const modal = document.getElementById('detailModal');
+            const detailContent = document.getElementById('detailContent');
+            const detailTitle = document.getElementById('detailTitle');
+
+            detailTitle.textContent = `Buscando: ${ringNumber}`;
+            detailContent.innerHTML = '<p class="text-center text-gray-500 dark:text-gray-400">Cargando detalles...</p>';
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            const pigeon = pigeonsArray.find(p => p.ringNumber === ringNumber);
+
+            if (pigeon) {
+                detailTitle.textContent = `Detalles de ${pigeon.name} (${pigeon.ringNumber})`;
+                const imageSrc = pigeon.imageData || PLACEHOLDER_IMAGE; // Usar imageData para la imagen
+
+                // Usamos JSON.stringify para pasar el objeto completo al modal de edición
+                const pigeonJsonString = JSON.stringify(pigeon).replace(/"/g, '&quot;');
+                
+                // --- Nueva Lógica para Botones Ver Padre/Madre ---
+                
+                // Botón/link para el Padre
+                let fatherRingDisplay = '<span class="text-gray-500 dark:text-gray-400">N/A</span>';
+                if (pigeon.fatherRingNumber) {
+                    fatherRingDisplay = `
+                        <span class="flex flex-col sm:flex-row items-start sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
+                            <span class="font-semibold text-gray-800 dark:text-gray-200">${pigeon.fatherRingNumber}</span>
+                            <button onclick="viewPigeonDetail('${pigeon.fatherRingNumber}', event)"
+                                    class="ring-link text-xs font-medium px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 hover:bg-blue-200 transition duration-150 dark:bg-blue-900 dark:text-blue-100 dark:hover:bg-blue-800">
+                                Ver Padre
+                            </button>
+                        </span>`;
+                }
+
+                // Botón/link para la Madre
+                let motherRingDisplay = '<span class="text-gray-500 dark:text-gray-400">N/A</span>';
+                if (pigeon.motherRingNumber) {
+                    motherRingDisplay = `
+                        <span class="flex flex-col sm:flex-row items-start sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
+                            <span class="font-semibold text-gray-800 dark:text-gray-200">${pigeon.motherRingNumber}</span>
+                            <button onclick="viewPigeonDetail('${pigeon.motherRingNumber}', event)"
+                                    class="ring-link text-xs font-medium px-2 py-0.5 rounded-full bg-pink-100 text-pink-700 hover:bg-pink-200 transition duration-150 dark:bg-pink-900 dark:text-pink-100 dark:hover:bg-pink-800">
+                                Ver Madre
+                            </button>
+                        </span>`;
+                }
+                
+                detailContent.innerHTML = `
+                    <div class="flex flex-col items-center space-y-4">
+                        <img src="${imageSrc}" onerror="this.onerror=null; this.src='${PLACEHOLDER_IMAGE}';"
+                             alt="Foto de ${pigeon.name}"
+                             class="w-32 h-32 object-cover rounded-full border-4 border-blue-200">
+                        <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">${pigeon.name || 'Sin Nombre'}</p>
+                    </div>
+                    
+                    <div class="border-t dark:border-gray-700 pt-4 space-y-2">
+                        <p><strong>N° Anillo:</strong> ${pigeon.ringNumber}</p>
+                        <p><strong>Sexo:</strong> ${pigeon.sex}</p>
+                        <p><strong>Fecha Nac.:</strong> ${pigeon.birthDate || 'N/A'}</p>
+                        <p><strong>Plumaje:</strong> ${pigeon.plumage || 'N/A'}</p>
+                        <p><strong>Anillado Por:</strong> ${pigeon.bandedBy || 'N/A'}</p>
+                    </div>
+
+                    <fieldset class="border border-gray-300 dark:border-gray-700 p-3 rounded-lg bg-gray-50 dark:bg-gray-900">
+                        <legend class="text-md font-semibold text-gray-700 dark:text-gray-200 px-2">Genealogía</legend>
+                        <p class="mt-2 flex justify-between items-start sm:items-center">
+                            <span class="font-bold text-gray-700 dark:text-gray-300">Padre (Anillo):</span> 
+                            ${fatherRingDisplay}
+                        </p>
+                        <p class="text-sm italic text-gray-600 dark:text-gray-400 ml-4">${pigeon.fatherDescription || 'Sin descripción.'}</p>
+                        <p class="mt-2 flex justify-between items-start sm:items-center">
+                            <span class="font-bold text-gray-700 dark:text-gray-300">Madre (Anillo):</span> 
+                            ${motherRingDisplay}
+                        </p>
+                        <p class="text-sm italic text-gray-600 dark:text-gray-400 ml-4">${pigeon.motherDescription || 'Sin descripción.'}</p>
+                    </fieldset>
+                    
+                    <!-- Botones de Acción Movidós al Modal de Detalles -->
+                    <div class="flex justify-center space-x-4 mt-6 border-t dark:border-gray-700 pt-4">
+                        <button onclick="openFormModal(${pigeonJsonString})"
+                                class="text-sm px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white font-medium rounded-xl transition transform hover:scale-105 shadow-md">
+                            Editar Paloma
+                        </button>
+                        <button onclick="deleteAndClose('${pigeon.ringNumber}')"
+                                class="text-sm px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl transition transform hover:scale-105 shadow-md">
+                            Eliminar Paloma
+                        </button>
+                    </div>
+                `;
+            } else {
+                detailTitle.textContent = `Paloma No Encontrada`;
+                detailContent.innerHTML = `<p class="text-center text-red-500">No se encontró ninguna paloma con el N° de Anillo: <strong>${ringNumber}</strong>.</p>`;
+            }
+        };
+
+        /** Cierra el modal de detalles. */
+        window.closeDetailModal = () => {
+            const modal = document.getElementById('detailModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        };
+
+        // Iniciar la aplicación: Cargar datos del Local Storage al iniciar
+        window.onload = () => {
+            initDarkMode(); // 1. Inicializa el modo oscuro
+            loadPigeons(); // 2. Carga los datos de las palomas
+        };
+    </script>
+</body>
+</html>
